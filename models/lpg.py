@@ -56,6 +56,12 @@ def plot_lifetime_rewards(rewards, window):
     plt.savefig('plots/lifetime-rewards.pdf')
     plt.show()
 
+def get_returns(rewards, discount_factor):
+    ret = 0
+    for reward in rewards[-1::-1]:
+        ret = reward + discount_factor * ret
+    return ret
+
 class LPGAgent():
     MemoryEntry = namedtuple('MemoryEntry', ['state', 'action', 'reward', 'next_state', 'done'])
 
@@ -130,7 +136,8 @@ class LPGAgent():
 
     def train(self, n_steps):
         rewards = []
-        episode_rewards = 0
+        returns = []
+        episode_rewards = []
         state = self.env.reset()
 
         for _ in tqdm(range(n_steps)):
@@ -150,14 +157,15 @@ class LPGAgent():
                     self.lpg.compute_lpg_gradient()
 
             state = next_state
-            episode_rewards += reward
+            episode_rewards.append(reward)
 
             if done:
-                rewards.append(episode_rewards)
-                episode_rewards = 0
+                rewards.append(np.sum(episode_rewards))
+                returns.append(get_returns(episode_rewards, self.discount_factor))
+                episode_rewards = []
                 state = self.env.reset()
         
-        return rewards
+        return rewards, returns
 
 class LPG():
     MemoryEntry = namedtuple('LPGMemoryEntry', ['state', 'action', 'reward', 'next_state', 'done', 'policy_target', 'y_target'])
@@ -213,7 +221,7 @@ class LPG():
 
         start = time.time()
         for epoch in range(lifetimes):
-            env = get_tabular_grid('very-small')
+            env = get_tabular_grid('small-sparse')
             self.lpg_memory = []
             self.agent = LPGAgent(self, env)
 

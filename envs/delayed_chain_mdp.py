@@ -27,8 +27,6 @@ class DelayedChainMDP(Env):
             reward = 2 * self.rng.integers(0, 2) - 1 if self.noisy else 0
             return (self.correct_action, self.chosen_action, self.steps), reward, False, None
 
-            
-
     def reset(self):
         self.steps = 0
         self.correct_action = self.rng.integers(0, 2)
