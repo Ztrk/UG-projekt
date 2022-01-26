@@ -130,7 +130,7 @@ def get_tabular_grid(env_type, is_random=False, collect_actions=False):
             return TabularGrid((5, 7), objects, max_steps=50, collect_actions=collect_actions)
         elif env_type == 'very-small':
             objects = [Object(1, 1, 1), Object(-1, 1, 1)]
-            return TabularGrid((3, 3), objects, max_steps=10, collect_actions=collect_actions)
+            return TabularGrid((2, 2), objects, max_steps=10, collect_actions=collect_actions)
         raise ValueError('Wrong evironment type')
     else:
         if env_type == 'dense':
